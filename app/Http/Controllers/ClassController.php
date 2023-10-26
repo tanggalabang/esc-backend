@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Imports\StudentImport;
 use App\Jobs\ProsessSendEmail;
 use App\Mail\AddStudentEmail;
+use App\Models\ClassModel;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -13,14 +14,14 @@ use Validator;
 use Str;
 
 
-class StudentController extends Controller
+class ClassController extends Controller
 {
   /**
    * Display a listing of the resource.
    */
   public function index()
   {
-    $users = User::getStudent();
+    $users = ClassModel::getClass();
 
     return response()->json($users, 200);
   }
@@ -40,28 +41,15 @@ class StudentController extends Controller
   {
     $input = $request->all();
 
-    $validator = Validator::make($input, [
-      "email" => "required|min:4"
-    ]);
-
-    if ($validator->fails()) {
-      return $this->sendError("Validation Error", $validator->errors());
+    $nameArray = $request->all();
+    foreach ($nameArray as $name) {
+      $model = new ClassModel(); // Ganti YourModel dengan nama model Anda
+      $model->name = $name['name'];
+      $model->save();
     }
 
-    $password = Str::random(10);
-    $student = new User;
-    $student->nis = trim($request->nis);
-    $student->name = trim($request->name);
-    $student->email = trim($request->email);
-    $student->password = Hash::make($password);
-    $student->user_type = 3;
-    $student->save();
 
-
-    $emailTo = $request->email;
-    Mail::to($emailTo)->send(new AddStudentEmail($student->nis, $student->name, $student->email, $password));
-
-    return $this->sendResponse($student, "Product created succesfully");
+    return $this->sendResponse($model, "Class created succesfully");
   }
 
   /**
@@ -87,22 +75,11 @@ class StudentController extends Controller
   {
     $input = $request->all();
 
-    $validator = Validator::make($input, [
-      "email" => "required|min:4"
-    ]);
+    $class = ClassModel::find($id);
+    $class->name = trim($request->name);
+    $class->save();
 
-    if ($validator->fails()) {
-      return $this->sendError("Validation Error", $validator->errors());
-    }
-
-    // $student= User::create($input);
-    $student = User::find($id);
-    $student->nis = trim($request->nis);
-    $student->name = trim($request->name);
-    $student->email = trim($request->email);
-    $student->save();
-
-    return $this->sendResponse($student, "Product updated succesfully");
+    return $this->sendResponse($class, "Class updated succesfully");
   }
 
   /**
@@ -110,10 +87,10 @@ class StudentController extends Controller
    */
   public function destroy(string $id)
   {
-    $student = User::find($id);
+    $student = ClassModel::find($id);
     $student->is_delete = 1;
     $student->save();
-    return $this->sendResponse($student, "Product deleted succesfully");
+    return $this->sendResponse($student, "Class deleted succesfully");
   }
 
   public function import(Request $request)

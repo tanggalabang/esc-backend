@@ -13,14 +13,14 @@ use Validator;
 use Str;
 
 
-class StudentController extends Controller
+class TeacherController extends Controller
 {
   /**
    * Display a listing of the resource.
    */
   public function index()
   {
-    $users = User::getStudent();
+    $users = User::getTeacher();
 
     return response()->json($users, 200);
   }
@@ -49,19 +49,19 @@ class StudentController extends Controller
     }
 
     $password = Str::random(10);
-    $student = new User;
-    $student->nis = trim($request->nis);
-    $student->name = trim($request->name);
-    $student->email = trim($request->email);
-    $student->password = Hash::make($password);
-    $student->user_type = 3;
-    $student->save();
+    $teacher = new User;
+    $teacher->name = trim($request->name);
+    $teacher->email = trim($request->email);
+    // $teacher->email = trim($request->email);
+    $teacher->password = Hash::make($password);
+    $teacher->user_type = 2;
+    $teacher->save();
 
 
-    $emailTo = $request->email;
-    Mail::to($emailTo)->send(new AddStudentEmail($student->nis, $student->name, $student->email, $password));
+    // $emailTo = $request->email;
+    // Mail::to($emailTo)->send(new AddteacherEmail($teacher->nis, $teacher->name, $teacher->email, $password));
 
-    return $this->sendResponse($student, "Product created succesfully");
+    return $this->sendResponse($teacher, "Teacher created succesfully");
   }
 
   /**

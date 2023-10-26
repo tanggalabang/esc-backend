@@ -24,7 +24,8 @@ class StudentImport implements ToModel, WithHeadingRow, WithValidation
       'nis' => $row['nis'],
       'name' => $row['name'],
       'email' => $row['email'],
-      'password' => Hash::make($password)
+      'password' => Hash::make($password),
+      'user_type' => 3,
     ]);
 
     // Tambahkan data yang diimpor ke daftar
