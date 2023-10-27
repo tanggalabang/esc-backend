@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Imports\StudentImport;
+use App\Imports\TeacherImport;
 use App\Jobs\ProsessSendEmail;
 use App\Mail\AddStudentEmail;
+use App\Models\ClassModel;
+use App\Models\Subject;
+use App\Models\TimesTable;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -20,9 +24,48 @@ class TeacherController extends Controller
    */
   public function index()
   {
+    $class = ClassModel::getClass();
+    $subject = Subject::getSubject();
+    $tiTa = TimesTable::getTimesTable();
     $users = User::getTeacher();
 
-    return response()->json($users, 200);
+    $data = [];
+
+    foreach ($users as $user) {
+      $userData = $user->toArray();
+
+      // Inisialisasi array untuk menyimpan subjek dan kelas yang berhubungan dengan pengguna
+      $userData['subject'] = [];
+      $userData['classes'] = [];
+
+      // Array tambahan untuk melacak subjek dan kelas yang sudah ditambahkan ke pengguna
+      $addedSubjects = [];
+      $addedClasses = [];
+
+      // Cari subjek dan kelas yang berhubungan dengan pengguna dalam $tiTa
+      foreach ($tiTa as $schedule) {
+        if ($schedule['teacher_id'] == $user['id']) {
+          // Temukan subjek yang sesuai
+          $subjectData = collect($subject)->where('id', $schedule['subject_id'])->first();
+          if ($subjectData && !in_array($subjectData['id'], $addedSubjects)) {
+            $userData['subject'][] = $subjectData;
+            $addedSubjects[] = $subjectData['id'];
+          }
+
+          // Temukan kelas yang sesuai
+          $classData = collect($class)->where('id', $schedule['class_id'])->first();
+          if ($classData && !in_array($classData['id'], $addedClasses)) {
+            $userData['classes'][] = $classData;
+            $addedClasses[] = $classData['id'];
+          }
+        }
+      }
+
+      $data[] = $userData;
+    }
+
+
+    return response()->json($data, 200);
   }
 
   /**
@@ -52,14 +95,13 @@ class TeacherController extends Controller
     $teacher = new User;
     $teacher->name = trim($request->name);
     $teacher->email = trim($request->email);
-    // $teacher->email = trim($request->email);
     $teacher->password = Hash::make($password);
     $teacher->user_type = 2;
     $teacher->save();
 
 
-    // $emailTo = $request->email;
-    // Mail::to($emailTo)->send(new AddteacherEmail($teacher->nis, $teacher->name, $teacher->email, $password));
+    $emailTo = $request->email;
+    Mail::to($emailTo)->send(new AddStudentEmail($teacher->name, $teacher->email, $password));
 
     return $this->sendResponse($teacher, "Teacher created succesfully");
   }
@@ -121,21 +163,18 @@ class TeacherController extends Controller
     try {
       $file = $request->file('file')->store('public/import');
 
-      $import = new StudentImport;
+      $import = new TeacherImport;
       $import->import($file);
 
       $importedData = $import->getImportedData();
       $importedEmails = $import->getImportedEmails(); // Dapatkan array email dari StudentImport
 
       foreach ($importedData as $data) {
-        $nis = $data['nis'];
         $name = $data['name'];
         $email = $data['email'];
         $password = $data['password'];
 
-        // Mail::to($email)->send(new AddStudentEmail($nis, $name, $email, $password));
-        ProsessSendEmail::dispatch($nis, $name, $email, $password);
-        // Lakukan sesuatu dengan data ini, seperti menyimpannya ke database atau melakukan operasi lainnya.
+        ProsessSendEmail::dispatch($name, $email, $password);
       }
 
 

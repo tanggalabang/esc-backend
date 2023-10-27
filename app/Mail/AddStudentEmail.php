@@ -14,7 +14,6 @@ class AddStudentEmail extends Mailable
 {
   use Queueable, SerializesModels;
 
-  public $nis;
   public $name;
   public $email;
   public $password;
@@ -22,9 +21,8 @@ class AddStudentEmail extends Mailable
   /**
    * Create a new message instance.
    */
-  public function __construct($nis, $name, $email, $password)
+  public function __construct($name, $email, $password)
   {
-    $this->nis = $nis;
     $this->name = $name;
     $this->email = $email;
     $this->password = $password;

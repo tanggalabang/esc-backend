@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Imports\StudentImport;
 use App\Jobs\ProsessSendEmail;
 use App\Mail\AddStudentEmail;
+use App\Models\ClassModel;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -20,9 +21,24 @@ class StudentController extends Controller
    */
   public function index()
   {
+    $class = ClassModel::getClass();
     $users = User::getStudent();
 
-    return response()->json($users, 200);
+    $data = [];
+
+    foreach ($users as $user) {
+      $userData = $user;
+
+      // Cari kelas yang sesuai dengan class_id dari pengguna
+      $classData = collect($class)->where('id', $user['class_id'])->first();
+      if ($classData) {
+        $userData['class'] = $classData['name'];
+      }
+
+      $data[] = $userData;
+    }
+
+    return response()->json($data, 200);
   }
 
   /**
@@ -48,11 +64,14 @@ class StudentController extends Controller
       return $this->sendError("Validation Error", $validator->errors());
     }
 
+    $class = ClassModel::where('name', $request['class'])->first();
+
     $password = Str::random(10);
     $student = new User;
     $student->nis = trim($request->nis);
     $student->name = trim($request->name);
     $student->email = trim($request->email);
+    $student->class_id = $class['id'];
     $student->password = Hash::make($password);
     $student->user_type = 3;
     $student->save();
@@ -128,17 +147,12 @@ class StudentController extends Controller
       $importedEmails = $import->getImportedEmails(); // Dapatkan array email dari StudentImport
 
       foreach ($importedData as $data) {
-        $nis = $data['nis'];
         $name = $data['name'];
         $email = $data['email'];
         $password = $data['password'];
 
-        // Mail::to($email)->send(new AddStudentEmail($nis, $name, $email, $password));
-        ProsessSendEmail::dispatch($nis, $name, $email, $password);
-        // Lakukan sesuatu dengan data ini, seperti menyimpannya ke database atau melakukan operasi lainnya.
+        ProsessSendEmail::dispatch($name, $email, $password);
       }
-
-
 
       return response()->json([
         'message' => 'Data berhasil disimpan',
@@ -146,10 +160,7 @@ class StudentController extends Controller
         'imported_emails' => $importedEmails, // Tambahkan data email ke respons JSON
 
       ], 200);
-
-      // return response()->json(['message' => 'Data berhasil disimpan'], 200);
     } catch (\Exception $e) {
-      // Handle other exceptions, e.g., file upload issues
       return response()->json(['message' => 'Error, duplicate email or nis. Please check the data', 'error' => $e->getMessage()], 500);
     }
   }

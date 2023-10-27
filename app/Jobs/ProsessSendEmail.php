@@ -15,7 +15,6 @@ class ProsessSendEmail implements ShouldQueue
 {
   use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-  public $nis;
   public $name;
   public $email;
   public $password;
@@ -23,9 +22,8 @@ class ProsessSendEmail implements ShouldQueue
   /**
    * Create a job instance.
    */
-  public function __construct($nis, $name, $email, $password)
+  public function __construct($name, $email, $password)
   {
-    $this->nis = $nis;
     $this->name = $name;
     $this->email = $email;
     $this->password = $password;
@@ -35,6 +33,6 @@ class ProsessSendEmail implements ShouldQueue
    */
   public function handle(): void
   {
-    Mail::to($this->email)->send(new AddStudentEmail($this->nis, $this->name, $this->email, $this->password));
+    Mail::to($this->email)->send(new AddStudentEmail($this->name, $this->email, $this->password));
   }
 }

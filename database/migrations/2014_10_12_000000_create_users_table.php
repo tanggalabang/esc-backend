@@ -17,6 +17,7 @@ return new class extends Migration
       $table->string('nis')->nullable();
       $table->string('name');
       $table->string('email');
+      $table->string('profile_pic')->nullable();
       $table->timestamp('email_verified_at')->nullable();
       $table->string('password');
       $table->integer('class_id')->nullable();

@@ -18,7 +18,6 @@
     </div>
 
     <ul class="list-group">
-      <li class="list-group-item">ID Number (NIS): {{ $nis }}</li>
       <li class="list-group-item">Name: {{ $name }}</li>
       <li class="list-group-item">Email: {{ $email }}</li>
       <li class="list-group-item text-danger">Password: {{$password}}</li>

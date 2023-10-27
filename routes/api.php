@@ -7,6 +7,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TimesTableController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,16 +21,25 @@ use App\Http\Controllers\TimesTableController;
 */
 
 Route::middleware(['auth:sanctum'])->group(function () {
+  //authentication
   Route::get('/user', function (Request $request) {
     return $request->user();
   });
-
-  Route::resource("students", StudentController::class);
-  Route::resource("teacher", TeacherController::class);
+  //class subject
   Route::resource("class", ClassController::class);
   Route::resource("subject", SubjectController::class);
+  //student
+  Route::resource("students", StudentController::class);
   Route::post('student-excel', [StudentController::class, 'import']);
+  Route::get('template-excel', [StudentController::class, 'templateExcel']);
+  //teacher
+  Route::resource("teacher", TeacherController::class);
+  Route::post('teacher-excel', [TeacherController::class, 'import']);
+  //times table
   Route::post('times-table', [TimesTableController::class, 'store']);
   Route::get('times-table/{classId}', [TimesTableController::class, 'show']);
-  Route::get('template-excel', [StudentController::class, 'templateExcel']);
+  //profile
+  Route::put('change-password', [UserController::class, 'changePassword']);
+  Route::post('update-profile', [UserController::class, 'update']);
+  Route::post('delete-pic', [UserController::class, 'deletePic']);
 });
