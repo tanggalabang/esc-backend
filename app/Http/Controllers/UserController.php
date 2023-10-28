@@ -11,7 +11,6 @@ use Str;
 
 class UserController extends Controller
 {
-  //
   public function changePassword(Request $request)
   {
     $input = $request->all();
