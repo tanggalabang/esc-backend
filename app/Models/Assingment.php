@@ -10,6 +10,11 @@ class Assingment extends Model
   use HasFactory;
   protected $table = 'assignment';
 
+  // protected $primaryKey = 'uid'; // Menentukan 'uid' sebagai primary key
+  protected $primaryKey = 'uid'; // Menentukan 'uid' sebagai primary key
+  protected $keyType = 'string'; // Menentukan tipe data 'uid'
+
+
   protected $fillable = [
     'uid',
     'name',

@@ -21,10 +21,43 @@ class AssignmentController extends Controller
    */
   public function index()
   {
-    $data = Assingment::getAssignment();
-    // $data = Assingment::all();
+    $assignments = Assingment::getAssignment();
+    $classes = ClassModel::getClass();
+    $subjects = Subject::getSubject();
 
-    return response()->json($data, 200);
+    // Buat array asosiatif untuk menghubungkan class_id ke nama class
+    $classMap = [];
+    foreach ($classes as $class) {
+      $classMap[$class['id']] = $class['name'];
+    }
+
+    // Buat array asosiatif untuk menghubungkan subject_id ke nama subject
+    $subjectMap = [];
+    foreach ($subjects as $subject) {
+      $subjectMap[$subject['id']] = $subject['name'];
+    }
+
+    // Gabungkan data dari $assignment dengan nama class dan subject
+    $mergedAssignments = [];
+    foreach ($assignments as $assignment) {
+      $mergedAssignment = [
+        'uid' => $assignment['uid'],
+        'name' => $assignment['name'],
+        'class_id' => $assignment['class_id'],
+        'subject_id' => $assignment['subject_id'],
+        'class_name' => $classMap[$assignment['class_id']],
+        'subject_name' => $subjectMap[$assignment['subject_id']],
+        'due_date' => $assignment['due_date'],
+        'content' => $assignment['content'],
+        'is_delete' => $assignment['is_delete'],
+        'created_at' => $assignment['created_at'],
+        'updated_at' => $assignment['updated_at'],
+      ];
+
+      $mergedAssignments[] = $mergedAssignment;
+    }
+
+    return response()->json($mergedAssignments, 200);
   }
 
   /**
@@ -38,32 +71,67 @@ class AssignmentController extends Controller
   /**
    * Store a newly created resource in storage.
    */
+  public function storeAss(Request $request)
+  {
+    try {
+      $input = $request->all();
+
+      $validator = Validator::make($input, [
+        "name" => "required",
+        "class" => "required",
+        "subject" => "required",
+        "dueDate" => "required|date",
+        "content" => "required"
+      ]);
+
+      if ($validator->fails()) {
+        return $this->sendError("Validation Error", $validator->errors());
+      }
+
+      // $data = Assingment::find($request['uid']);
+      $data = Assingment::where('uid', $request['uid'])->first();
+      $data->name = trim($request->name);
+      $data->class_id = ClassModel::where('name', $request->class)->first()->id;
+      $data->subject_id = Subject::where('name', $request->subject)->first()->id;
+      $data->due_date = trim($request->dueDate);
+      $data->content = trim($request->content);
+      $data->save();
+
+      return $this->sendResponse($data, "Assignmet created succesfully");
+    } catch (\Exception $e) {
+      return response()->json(['message' => 'Error, duplicate email or nis. Please check the data', 'error' => $e->getMessage()], 500);
+    }
+  }
   public function store(Request $request)
   {
-    $input = $request->all();
+    try {
+      $input = $request->all();
 
-    $validator = Validator::make($input, [
-      "name" => "required",
-      "class" => "required",
-      "subject" => "required",
-      "dueDate" => "required|date",
-      "content" => "required"
-    ]);
+      $validator = Validator::make($input, [
+        "name" => "required",
+        "class" => "required",
+        "subject" => "required",
+        "dueDate" => "required|date",
+        "content" => "required"
+      ]);
 
-    if ($validator->fails()) {
-      return $this->sendError("Validation Error", $validator->errors());
+      if ($validator->fails()) {
+        return $this->sendError("Validation Error", $validator->errors());
+      }
+
+      $data = new Assingment;
+      $data->name = trim($request->name);
+      $data->uid = trim($request->uid);
+      $data->class_id = ClassModel::where('name', $request->class)->first()->id;
+      $data->subject_id = Subject::where('name', $request->subject)->first()->id;
+      $data->due_date = trim($request->dueDate);
+      $data->content = trim($request->content);
+      $data->save();
+
+      return $this->sendResponse($data, "Assignmet created succesfully");
+    } catch (\Exception $e) {
+      return response()->json(['message' => 'Error, duplicate email or nis. Please check the data', 'error' => $e->getMessage()], 500);
     }
-
-    $data = new Assingment;
-    $data->name = trim($request->name);
-    $data->uid = trim($request->uid);
-    $data->class_id = ClassModel::where('name', $request->class)->first()->id;
-    $data->subject_id = Subject::where('name', $request->subject)->first()->id;
-    $data->due_date = trim($request->dueDate);
-    $data->content = trim($request->content);
-    $data->save();
-
-    return $this->sendResponse($data, "Assignmet created succesfully");
   }
 
   /**
@@ -112,7 +180,7 @@ class AssignmentController extends Controller
    */
   public function destroy(string $id)
   {
-    $student = User::find($id);
+    $student = Assingment::find($id);
     $student->is_delete = 1;
     $student->save();
     return $this->sendResponse($student, "Product deleted succesfully");
@@ -136,8 +204,6 @@ class AssignmentController extends Controller
 
         ProsessSendEmail::dispatch($name, $email, $password);
       }
-
-
 
       return response()->json([
         'message' => 'Data berhasil disimpan',
@@ -163,6 +229,33 @@ class AssignmentController extends Controller
     }
   }
 
+  public function updateAss(Request $request, $id)
+  {
+    try {
+      $files = [];
+      if ($request->file('files')) {
+        File::where('ass_uid', $id)->delete();
+
+        foreach ($request->file('files') as $key => $file) {
+          $file_name = time() . rand(1, 99);
+          $file->move(public_path('uploads'), $file_name . '-' . $file->getClientOriginalName());
+          $files[] = [
+            'ass_uid' => $id, // Tambahkan UID ke array file
+            'name' => 'uploads/' . $file_name . '-' . $file->getClientOriginalName(),
+
+          ];
+        }
+        foreach ($files as $key => $file) {
+          File::create($file);
+        }
+        return $this->sendResponse($files, "Files created succesfully");
+      }
+      return $this->sendResponse($files, "Files empty not edit");
+    } catch (\Exception $e) {
+      return response()->json(['message' => 'Error, duplicate email or nis. Please check the data', 'error' => $e->getMessage()], 500);
+    }
+    // return response()->json($id);
+  }
   public function add(Request $request, $id)
   {
     try {
@@ -173,13 +266,10 @@ class AssignmentController extends Controller
       $files = [];
       if ($request->file('files')) {
         foreach ($request->file('files') as $key => $file) {
-          // $file_name = time() . rand(1, 99) . '.' . $file->extension();
           $file_name = time() . rand(1, 99);
           $file->move(public_path('uploads'), $file_name . '-' . $file->getClientOriginalName());
-          // $files[]['name'] = 'uploads/' . $file_name;
           $files[] = [
             'ass_uid' => $id, // Tambahkan UID ke array file
-            // 'name' => 'uploads/' . $file_name,
             'name' => 'uploads/' . $file_name . '-' . $file->getClientOriginalName(),
 
           ];

@@ -50,9 +50,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 
 Route::resource("teacher-assignment", AssignmentController::class);
+Route::post("teacher-assignment-edit", [AssignmentController::class, 'storeAss']);
 
 Route::post('files/{uid}', [AssignmentController::class, 'add']);
 Route::get('files', [AssignmentController::class, 'get']);
+Route::post('files-edit/{uid}', [AssignmentController::class, 'updateAss']);
 
 Route::get('comment-assignment', [CommentAssignmentController::class, 'index']);
 Route::post('comment-assignment', [CommentAssignmentController::class, 'create']);
