@@ -21,7 +21,6 @@ return new class extends Migration
       $table->timestamp('email_verified_at')->nullable();
       $table->string('password');
       $table->integer('class_id')->nullable();
-      $table->integer('subject_id')->nullable();
       $table->tinyInteger('is_delete')->default(0);
       $table->rememberToken();
       $table->timestamps();

@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\ClassController;
+use App\Http\Controllers\CommentAssignmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StudentController;
@@ -42,4 +44,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::put('change-password', [UserController::class, 'changePassword']);
   Route::post('update-profile', [UserController::class, 'update']);
   Route::post('delete-pic', [UserController::class, 'deletePic']);
+
+  //TEACHER
+  //assignment
 });
+
+Route::resource("teacher-assignment", AssignmentController::class);
+
+Route::post('files/{uid}', [AssignmentController::class, 'add']);
+Route::get('files', [AssignmentController::class, 'get']);
+
+Route::get('comment-assignment', [CommentAssignmentController::class, 'index']);
+Route::post('comment-assignment', [CommentAssignmentController::class, 'create']);

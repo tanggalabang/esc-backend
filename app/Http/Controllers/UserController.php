@@ -39,6 +39,18 @@ class UserController extends Controller
   }
   public function update(Request $request)
   {
+    // if ($request->hasFile('file')) {
+    //   $uploadedFiles = $request->file('file');
+    //   $fileCount = count($uploadedFiles);
+
+    //   if ($fileCount > 0) {
+    //     return "Jumlah file yang terkirim: " . $fileCount;
+    //   } else {
+    //     return "Tidak ada file yang terkirim.";
+    //   }
+    // } else {
+    //   return "Tidak ada file yang terkirim.";
+    // }
     $user = User::getSingle(Auth::user()->id);
     if (!empty($request->name)) {
       $user->name = trim($request->name);
@@ -63,5 +75,9 @@ class UserController extends Controller
     $user->save();
 
     return response($user, 200);
+    // $input = $request->all();
+
+    // var_dump($input);
+    // return response()->json($input);
   }
 }
