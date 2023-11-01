@@ -36,7 +36,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::post('student-excel', [StudentController::class, 'import']);
   Route::get('template-excel', [StudentController::class, 'templateExcel']);
   //teacher
-  Route::resource("teacher", TeacherController::class);
   Route::post('teacher-excel', [TeacherController::class, 'import']);
   //times table
   Route::post('times-table', [TimesTableController::class, 'store']);
@@ -50,6 +49,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
   //assignment
 });
 
+
+Route::resource("teacher", TeacherController::class);
+
 Route::resource("teacher-assignment", AssignmentController::class);
 Route::post("teacher-assignment-edit", [AssignmentController::class, 'storeAss']);
 
@@ -62,3 +64,7 @@ Route::post('files-edit/{uid}', [AssignmentController::class, 'updateAss']);
 
 Route::get('comment-assignment', [CommentAssignmentController::class, 'index']);
 Route::post('comment-assignment', [CommentAssignmentController::class, 'create']);
+
+Route::get('times-table', [TimesTableController::class, 'indexClassTeacher']);
+
+Route::get('times-table-teacher-class', [TimesTableController::class, 'tttc']);

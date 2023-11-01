@@ -6,12 +6,58 @@ use App\Models\ClassModel;
 use App\Models\Subject;
 use App\Models\TimesTable;
 use App\Models\User;
+use Illuminate\Database\DBAL\TimestampType;
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Time;
 use Symfony\Component\VarDumper\VarDumper;
 
 class TimesTableController extends Controller
 {
   //
+  // public function index()
+  // {
+  //   $timesTable = TimesTable::all();
+  //   $class = ClassModel::getClass();
+
+  //   return response()->json($class);
+  // }
+  public function tttc()
+  {
+    $timesTable = TimesTable::all();
+    $class = ClassModel::getClass();
+    $teacher = User::getTeacher();
+
+    return response()->json($teacher);
+  }
+  public function indexClassTeacher()
+  {
+    $timesTable = TimesTable::all();
+    $class = ClassModel::getClass();
+
+    $classMap = []; // Membuat array untuk melacak kelas yang sudah ditemukan
+    $result = []; // Array untuk menyimpan hasil akhir
+
+    // Loop through $timesTable and add "class_name" field
+    foreach ($timesTable as $timetable) {
+      $classId = $timetable->class_id;
+
+      // Cek apakah kelas dengan id yang sama sudah ada dalam $classMap
+      if (!isset($classMap[$classId])) {
+        // Cari kelas yang sesuai dengan id atau nama
+        $classInfo = collect($class)->first(function ($item) use ($classId, $timetable) {
+          return $item['id'] == $classId || $item['name'] == $timetable->class_name;
+        });
+
+        if ($classInfo) {
+          $timetable->class_name = $classInfo['name'];
+          $classMap[$classId] = true; // Tandai kelas ini sudah ditemukan
+          $result[] = $timetable; // Tambahkan entri ke hasil akhir
+        }
+      }
+    }
+
+    return response()->json($result);
+  }
   public function store(Request $request)
   {
 
