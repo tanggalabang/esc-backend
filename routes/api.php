@@ -3,6 +3,7 @@
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\CommentAssignmentController;
+use App\Http\Controllers\MaterialController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StudentController;
@@ -51,6 +52,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 Route::resource("teacher-assignment", AssignmentController::class);
 Route::post("teacher-assignment-edit", [AssignmentController::class, 'storeAss']);
+
+Route::resource("teacher-material", MaterialController::class);
+Route::post("teacher-material-edit", [MaterialController::class, 'storeAss']);
 
 Route::post('files/{uid}', [AssignmentController::class, 'add']);
 Route::get('files', [AssignmentController::class, 'get']);
