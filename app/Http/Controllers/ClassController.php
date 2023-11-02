@@ -52,16 +52,16 @@ class ClassController extends Controller
     return response()->json($result, 200);
   }
 
-  // public function getClassByTeacher()
-  // {
-  //   $teacherId = 2;
+  public function getClassByStudent()
+  {
+    // $teacherId = 2;
+    // $teacherId = Auth::user()->id;
 
-  //   $timesTable = TimesTable::getTimesTable();
+    $class = ClassModel::getClass()->find(Auth::user()->class_id);
+    // $data = Assingment::find($request['uid']);
 
-  //   $class = ClassModel::getClass();
-
-  //   return response()->json($timesTable, 200);
-  // }
+    return response()->json($class, 200);
+  }
   public function index()
   {
     $users = ClassModel::getClass();
