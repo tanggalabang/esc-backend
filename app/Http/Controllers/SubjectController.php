@@ -4,10 +4,45 @@ namespace App\Http\Controllers;
 
 use App\Models\Subject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\ClassModel;
+use App\Models\TimesTable;
 
 
 class SubjectController extends Controller
 {
+  public function getSubjectByTeacher()
+  {
+    // $teacherId = 23;
+    $teacherId = Auth::user()->id;
+
+    $timesTable = TimesTable::getTimesTable();
+
+    // $class = ClassModel::getClass();
+    $subject = Subject::getSubject();
+
+    $result = [];
+    // $classIds = []; // Untuk melacak class_ids yang sudah ditambahkan ke hasil
+    $subjectIds = []; // Untuk melacak class_ids yang sudah ditambahkan ke hasil
+
+    foreach ($timesTable as $item) {
+      if ($item['teacher_id'] == $teacherId) {
+        $subjectId = $item['subject_id'];
+
+        // Periksa apakah class_id sudah ada di hasil
+        if (!in_array($subjectId, $subjectIds)) {
+          foreach ($subject as $subjectItem) {
+            if ($subjectItem['id'] == $subjectId) {
+              $result[] = $subjectItem;
+              $subjectIds[] = $subjectId; // Tambahkan class_id ke array pelacakan
+            }
+          }
+        }
+      }
+    }
+
+    return response()->json($result, 200);
+  }
   /**
    * Display a listing of the resource.
    */

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClassModel;
+use App\Models\Material;
 use App\Models\Subject;
 use App\Models\TimesTable;
 use App\Models\User;
@@ -13,14 +14,44 @@ use Symfony\Component\VarDumper\VarDumper;
 
 class TimesTableController extends Controller
 {
-  //
+
   // public function index()
   // {
-  //   $timesTable = TimesTable::all();
-  //   $class = ClassModel::getClass();
+  //   $selectedTeacherId = 2;
+  //   $timesTable = TimesTable::getTimesTable();
 
-  //   return response()->json($class);
+
+  //   return response()->json($material);
   // }
+  public function index()
+  {
+    $timesTable = TimesTable::all();
+
+    $material = Material::getMaterial();
+    // Teacher ID yang ingin Anda filter
+    $selectedTeacherId = 2;
+
+    // Membuat array kosong untuk menyimpan materi yang sesuai
+    $filteredMaterials = [];
+
+    // Loop melalui data timesTable
+    foreach ($timesTable as $time) {
+      // Periksa apakah class_id dari timesTable cocok dengan class_id pada materi
+      if ($time['class_id'] == $selectedTeacherId) {
+        // Temukan materi yang cocok dengan class_id yang sesuai dan tambahkan ke filteredMaterials
+        foreach ($material as $item) {
+          if ($item['class_id'] == $time['class_id']) {
+            $filteredMaterials[] = $item;
+          }
+        }
+      }
+    }
+
+    return response()->json($filteredMaterials);
+  }
+
+
+
   public function tttc()
   {
     $timesTable = TimesTable::all();

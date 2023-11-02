@@ -36,6 +36,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::post('student-excel', [StudentController::class, 'import']);
   Route::get('template-excel', [StudentController::class, 'templateExcel']);
   //teacher
+  Route::resource("teacher", TeacherController::class);
   Route::post('teacher-excel', [TeacherController::class, 'import']);
   //times table
   Route::post('times-table', [TimesTableController::class, 'store']);
@@ -47,24 +48,32 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
   //TEACHER
   //assignment
+  Route::resource("teacher-assignment", AssignmentController::class);
+  Route::post("teacher-assignment-edit", [AssignmentController::class, 'storeAss']);
+  //material
+  Route::post("teacher-material-edit", [MaterialController::class, 'storeAss']);
+  //file upload ass mat
+  Route::post('files/{uid}', [AssignmentController::class, 'add']);
+  Route::get('files', [AssignmentController::class, 'get']);
+  Route::post('files-edit/{uid}', [AssignmentController::class, 'updateAss']);
+  //comment ass mat
+  Route::get('comment-assignment', [CommentAssignmentController::class, 'index']);
+  Route::post('comment-assignment', [CommentAssignmentController::class, 'create']);
+  //times table
+
+  //TEACHER
 });
-
-
-Route::resource("teacher", TeacherController::class);
-
-Route::resource("teacher-assignment", AssignmentController::class);
-Route::post("teacher-assignment-edit", [AssignmentController::class, 'storeAss']);
-
 Route::resource("teacher-material", MaterialController::class);
-Route::post("teacher-material-edit", [MaterialController::class, 'storeAss']);
 
-Route::post('files/{uid}', [AssignmentController::class, 'add']);
-Route::get('files', [AssignmentController::class, 'get']);
-Route::post('files-edit/{uid}', [AssignmentController::class, 'updateAss']);
-
-Route::get('comment-assignment', [CommentAssignmentController::class, 'index']);
-Route::post('comment-assignment', [CommentAssignmentController::class, 'create']);
-
-Route::get('times-table', [TimesTableController::class, 'indexClassTeacher']);
-
+Route::get('times-table', [TimesTableController::class, 'index']);
 Route::get('times-table-teacher-class', [TimesTableController::class, 'tttc']);
+
+//get class subject by Teacher
+Route::get('class-teacher', [ClassController::class, 'getClassByTeacher']);
+Route::get('subject-teacher', [SubjectController::class, 'getSubjectByTeacher']);
+
+//get material by Teacher
+Route::get("material-student", [MaterialController::class, 'getMaterialByStudent']);
+Route::get('material-teacher', [MaterialController::class, 'getMaterialByTeacher']);
+Route::get("assignment-student", [AssignmentController::class, 'getAssignmentByStudent']);
+Route::get('assignment-teacher', [AssignmentController::class, 'getAssignmentByTeacher']);

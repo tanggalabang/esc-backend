@@ -17,6 +17,7 @@ return new class extends Migration
       $table->string('thumbnail')->nullable();
       $table->integer('class_id')->nullable();
       $table->integer('subject_id')->nullable();
+      $table->integer('created_by')->nullable();
       $table->longText('content');
       $table->tinyInteger('is_delete')->default(0);
       $table->timestamps();

@@ -30,6 +30,12 @@ class DatabaseSeeder extends Seeder
       'password' => Hash::make(11111111),
     ]);
     \App\Models\User::factory()->create([
+      'name' => 'Teacher2',
+      'email' => 'teacher2@email.com',
+      'user_type' => 2,
+      'password' => Hash::make(11111111),
+    ]);
+    \App\Models\User::factory()->create([
       'name' => 'Student',
       'email' => 'student@email.com',
       'user_type' => 3,

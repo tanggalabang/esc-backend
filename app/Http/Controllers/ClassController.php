@@ -6,7 +6,9 @@ use App\Imports\StudentImport;
 use App\Jobs\ProsessSendEmail;
 use App\Mail\AddStudentEmail;
 use App\Models\ClassModel;
+use App\Models\TimesTable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -19,6 +21,47 @@ class ClassController extends Controller
   /**
    * Display a listing of the resource.
    */
+  public function getClassByTeacher()
+  {
+    // $teacherId = 2;
+    $teacherId = Auth::user()->id;
+
+    $timesTable = TimesTable::getTimesTable();
+
+    $class = ClassModel::getClass();
+
+    $result = [];
+    $classIds = []; // Untuk melacak class_ids yang sudah ditambahkan ke hasil
+
+    foreach ($timesTable as $item) {
+      if ($item['teacher_id'] == $teacherId) {
+        $classId = $item['class_id'];
+
+        // Periksa apakah class_id sudah ada di hasil
+        if (!in_array($classId, $classIds)) {
+          foreach ($class as $classItem) {
+            if ($classItem['id'] == $classId) {
+              $result[] = $classItem;
+              $classIds[] = $classId; // Tambahkan class_id ke array pelacakan
+            }
+          }
+        }
+      }
+    }
+
+    return response()->json($result, 200);
+  }
+
+  // public function getClassByTeacher()
+  // {
+  //   $teacherId = 2;
+
+  //   $timesTable = TimesTable::getTimesTable();
+
+  //   $class = ClassModel::getClass();
+
+  //   return response()->json($timesTable, 200);
+  // }
   public function index()
   {
     $users = ClassModel::getClass();

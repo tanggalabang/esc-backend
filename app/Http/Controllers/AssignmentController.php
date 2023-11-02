@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Validator;
 use App\Models\File;
+use Illuminate\Support\Facades\Auth;
 use Str;
 
 
@@ -55,6 +56,100 @@ class AssignmentController extends Controller
       ];
 
       $mergedAssignments[] = $mergedAssignment;
+    }
+
+    return response()->json($mergedAssignments, 200);
+  }
+  public function getAssignmentByTeacher()
+  {
+    $assignments = Assingment::getAssignment();
+    $classes = ClassModel::getClass();
+    $subjects = Subject::getSubject();
+
+    // Deklarasikan class_id yang ingin Anda filter berdasarkan user yang login
+    // $selectedCreatedById = Auth::user()->id;
+    $selectedCreatedById = 3;
+
+    // Buat array asosiatif untuk menghubungkan class_id ke nama class
+    $classMap = [];
+    foreach ($classes as $class) {
+      $classMap[$class['id']] = $class['name'];
+    }
+
+    // Buat array asosiatif untuk menghubungkan subject_id ke nama subject
+    $subjectMap = [];
+    foreach ($subjects as $subject) {
+      $subjectMap[$subject['id']] = $subject['name'];
+    }
+
+    // Gabungkan data dari $assignment dengan nama class dan subject
+    $mergedAssignments = [];
+    foreach ($assignments as $assignment) {
+      if ($assignment['created_by'] == $selectedCreatedById) {
+        $mergedAssignment = [
+          'uid' => $assignment['uid'],
+          'name' => $assignment['name'],
+          'thumbnail' => $assignment['thumbnail'],
+          'class_id' => $assignment['class_id'],
+          'subject_id' => $assignment['subject_id'],
+          'class_name' => $classMap[$assignment['class_id']],
+          'subject_name' => $subjectMap[$assignment['subject_id']],
+          'due_date' => $assignment['due_date'],
+          'content' => $assignment['content'],
+          'is_delete' => $assignment['is_delete'],
+          'created_at' => $assignment['created_at'],
+          'updated_at' => $assignment['updated_at'],
+        ];
+
+        $mergedAssignments[] = $mergedAssignment;
+      }
+    }
+
+    return response()->json($mergedAssignments, 200);
+  }
+  public function getAssignmentByStudent()
+  {
+    $material = Assingment::getAssignment();
+    $classes = ClassModel::getClass();
+    $subjects = Subject::getSubject();
+
+    // Deklarasikan class_id yang ingin Anda filter berdasarkan user yang login
+    $selectedClassId = Auth::user()->class_id;
+    // $selectedClassId = 2;
+
+    // Buat array asosiatif untuk menghubungkan class_id ke nama class
+    $classMap = [];
+    foreach ($classes as $class) {
+      $classMap[$class['id']] = $class['name'];
+    }
+
+    // Buat array asosiatif untuk menghubungkan subject_id ke nama subject
+    $subjectMap = [];
+    foreach ($subjects as $subject) {
+      $subjectMap[$subject['id']] = $subject['name'];
+    }
+
+    // Gabungkan data dari $assignment dengan nama class dan subject
+    $mergedAssignments = [];
+    foreach ($material as $assignment) {
+      if ($assignment['class_id'] == $selectedClassId) {
+        $mergedAssignment = [
+          'uid' => $assignment['uid'],
+          'name' => $assignment['name'],
+          'thumbnail' => $assignment['thumbnail'],
+          'class_id' => $assignment['class_id'],
+          'subject_id' => $assignment['subject_id'],
+          'class_name' => $classMap[$assignment['class_id']],
+          'subject_name' => $subjectMap[$assignment['subject_id']],
+          'due_date' => $assignment['due_date'],
+          'content' => $assignment['content'],
+          'is_delete' => $assignment['is_delete'],
+          'created_at' => $assignment['created_at'],
+          'updated_at' => $assignment['updated_at'],
+        ];
+
+        $mergedAssignments[] = $mergedAssignment;
+      }
     }
 
     return response()->json($mergedAssignments, 200);
@@ -124,6 +219,7 @@ class AssignmentController extends Controller
       $data->uid = trim($request->uid);
       $data->class_id = ClassModel::where('name', $request->class)->first()->id;
       $data->subject_id = Subject::where('name', $request->subject)->first()->id;
+      $data->created_by = Auth::user()->id;
       $data->due_date = trim($request->dueDate);
       $data->content = trim($request->content);
       $data->save();

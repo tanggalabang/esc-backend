@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Validator;
 use App\Models\File;
 use App\Models\Material;
+use Illuminate\Support\Facades\Auth;
 use Str;
 
 
@@ -58,6 +59,101 @@ class MaterialController extends Controller
     return response()->json($mergedAssignments, 200);
   }
 
+  public function getMaterialByTeacher()
+  {
+    $material = Material::getMaterial();
+    $classes = ClassModel::getClass();
+    $subjects = Subject::getSubject();
+
+    // Deklarasikan class_id yang ingin Anda filter berdasarkan user yang login
+    $selectedCreatedById = Auth::user()->id;
+    // $selectedCreatedById = 3;
+
+    // Buat array asosiatif untuk menghubungkan class_id ke nama class
+    $classMap = [];
+    foreach ($classes as $class) {
+      $classMap[$class['id']] = $class['name'];
+    }
+
+    // Buat array asosiatif untuk menghubungkan subject_id ke nama subject
+    $subjectMap = [];
+    foreach ($subjects as $subject) {
+      $subjectMap[$subject['id']] = $subject['name'];
+    }
+
+    // Gabungkan data dari $assignment dengan nama class dan subject
+    $mergedAssignments = [];
+    foreach ($material as $assignment) {
+      if ($assignment['created_by'] == $selectedCreatedById) {
+        $mergedAssignment = [
+          'uid' => $assignment['uid'],
+          'name' => $assignment['name'],
+          'thumbnail' => $assignment['thumbnail'],
+          'class_id' => $assignment['class_id'],
+          'subject_id' => $assignment['subject_id'],
+          'class_name' => $classMap[$assignment['class_id']],
+          'subject_name' => $subjectMap[$assignment['subject_id']],
+          'due_date' => $assignment['due_date'],
+          'content' => $assignment['content'],
+          'is_delete' => $assignment['is_delete'],
+          'created_at' => $assignment['created_at'],
+          'updated_at' => $assignment['updated_at'],
+        ];
+
+        $mergedAssignments[] = $mergedAssignment;
+      }
+    }
+
+    return response()->json($mergedAssignments, 200);
+  }
+  public function getMaterialByStudent()
+  {
+    $material = Material::getMaterial();
+    $classes = ClassModel::getClass();
+    $subjects = Subject::getSubject();
+
+    // Deklarasikan class_id yang ingin Anda filter berdasarkan user yang login
+    $selectedClassId = Auth::user()->class_id;
+    // $selectedClassId = 2;
+
+    // Buat array asosiatif untuk menghubungkan class_id ke nama class
+    $classMap = [];
+    foreach ($classes as $class) {
+      $classMap[$class['id']] = $class['name'];
+    }
+
+    // Buat array asosiatif untuk menghubungkan subject_id ke nama subject
+    $subjectMap = [];
+    foreach ($subjects as $subject) {
+      $subjectMap[$subject['id']] = $subject['name'];
+    }
+
+    // Gabungkan data dari $assignment dengan nama class dan subject
+    $mergedAssignments = [];
+    foreach ($material as $assignment) {
+      if ($assignment['class_id'] == $selectedClassId) {
+        $mergedAssignment = [
+          'uid' => $assignment['uid'],
+          'name' => $assignment['name'],
+          'thumbnail' => $assignment['thumbnail'],
+          'class_id' => $assignment['class_id'],
+          'subject_id' => $assignment['subject_id'],
+          'class_name' => $classMap[$assignment['class_id']],
+          'subject_name' => $subjectMap[$assignment['subject_id']],
+          'due_date' => $assignment['due_date'],
+          'content' => $assignment['content'],
+          'is_delete' => $assignment['is_delete'],
+          'created_at' => $assignment['created_at'],
+          'updated_at' => $assignment['updated_at'],
+        ];
+
+        $mergedAssignments[] = $mergedAssignment;
+      }
+    }
+
+    return response()->json($mergedAssignments, 200);
+  }
+
   /**
    * Show the form for creating a new resource.
    */
@@ -94,6 +190,7 @@ class MaterialController extends Controller
       $data->class_id = ClassModel::where('name', $request->class)->first()->id;
       $data->subject_id = Subject::where('name', $request->subject)->first()->id;
       $data->content = trim($request->content);
+      $data->created_by = Auth::user()->id;
       if (!empty($request->file('image'))) {
         $ext = $request->file('image')->getClientOriginalExtension();
         $file = $request->file('image');
