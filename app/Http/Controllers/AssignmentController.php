@@ -25,6 +25,7 @@ class AssignmentController extends Controller
     $assignments = Assingment::getAssignment();
     $classes = ClassModel::getClass();
     $subjects = Subject::getSubject();
+    $users = User::getTeacher();
 
     // Buat array asosiatif untuk menghubungkan class_id ke nama class
     $classMap = [];
@@ -36,6 +37,12 @@ class AssignmentController extends Controller
     $subjectMap = [];
     foreach ($subjects as $subject) {
       $subjectMap[$subject['id']] = $subject['name'];
+    }
+
+    // Buat array asosiatif untuk menghubungkan subject_id ke nama subject
+    $teacherMap = [];
+    foreach ($users as $user) {
+      $teacherMap[$user['id']] = $user['name'];
     }
 
     // Gabungkan data dari $assignment dengan nama class dan subject
@@ -50,6 +57,7 @@ class AssignmentController extends Controller
         'subject_name' => $subjectMap[$assignment['subject_id']],
         'due_date' => $assignment['due_date'],
         'content' => $assignment['content'],
+        'autor' => $teacherMap[$assignment['created_by']],
         'is_delete' => $assignment['is_delete'],
         'created_at' => $assignment['created_at'],
         'updated_at' => $assignment['updated_at'],
@@ -67,8 +75,8 @@ class AssignmentController extends Controller
     $subjects = Subject::getSubject();
 
     // Deklarasikan class_id yang ingin Anda filter berdasarkan user yang login
-    // $selectedCreatedById = Auth::user()->id;
-    $selectedCreatedById = 3;
+    $selectedCreatedById = Auth::user()->id;
+    // $selectedCreatedById = 3;
 
     // Buat array asosiatif untuk menghubungkan class_id ke nama class
     $classMap = [];

@@ -7,6 +7,7 @@ use App\Http\Controllers\MaterialController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentWorkController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TimesTableController;
@@ -77,3 +78,11 @@ Route::get("material-student", [MaterialController::class, 'getMaterialByStudent
 Route::get('material-teacher', [MaterialController::class, 'getMaterialByTeacher']);
 Route::get("assignment-student", [AssignmentController::class, 'getAssignmentByStudent']);
 Route::get('assignment-teacher', [AssignmentController::class, 'getAssignmentByTeacher']);
+
+//student work
+Route::post('student-work', [StudentWorkController::class, 'store']);
+Route::get('student-work', [StudentWorkController::class, 'getWorkByStudent']);
+Route::put('student-work/{id}', [StudentWorkController::class, 'addUpdate']);
+
+//student
+Route::get('student-with-work', [StudentController::class, 'getStudentWithWork']);

@@ -6,6 +6,7 @@ use App\Imports\StudentImport;
 use App\Jobs\ProsessSendEmail;
 use App\Mail\AddStudentEmail;
 use App\Models\ClassModel;
+use App\Models\StudentWork;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -40,6 +41,43 @@ class StudentController extends Controller
 
     return response()->json($data, 200);
   }
+  public function getStudentWithWork()
+  {
+    $students = User::getStudent();
+    $studentWork = StudentWork::getStudentWork();
+    $class = ClassModel::getClass();
+
+    $mergedData = [];
+
+    foreach ($students as $student) {
+      $studentData = $student->toArray();
+      $studentData['student_work'] = [];
+
+      // Cari nama kelas berdasarkan class_id
+      $kelas = null;
+      foreach ($class as $kelasItem) {
+        if ($kelasItem->id === $student->class_id) {
+          $kelas = $kelasItem;
+          break;
+        }
+      }
+
+      if ($kelas) {
+        $studentData['class'] = $kelas->name;
+      }
+
+      foreach ($studentWork as $work) {
+        if ($work->student_id === $student->id) {
+          $studentData['student_work'][] = $work->toArray();
+        }
+      }
+
+      $mergedData[] = $studentData;
+    }
+
+    return response()->json($mergedData, 200);
+  }
+
 
   /**
    * Show the form for creating a new resource.
