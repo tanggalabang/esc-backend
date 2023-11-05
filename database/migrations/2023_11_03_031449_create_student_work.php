@@ -17,7 +17,7 @@ return new class extends Migration
       $table->string('ass_id')->nullable();
       $table->integer('class_id')->nullable();
       $table->longText('content');
-      $table->integer('score')->nullable();
+      $table->string('score')->nullable();
       $table->string('comment')->nullable();
       $table->tinyInteger('is_delete')->default(0);
       $table->timestamps();

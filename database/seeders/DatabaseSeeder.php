@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
       'user_type' => 1,
       'password' => Hash::make(11111111),
     ]);
+    //teacher
     \App\Models\User::factory()->create([
       'name' => 'Teacher',
       'email' => 'teacher@email.com',
@@ -35,12 +36,23 @@ class DatabaseSeeder extends Seeder
       'user_type' => 2,
       'password' => Hash::make(11111111),
     ]);
+    //student
     \App\Models\User::factory()->create([
       'name' => 'Student',
       'email' => 'student@email.com',
+      'class_id' => 1,
       'user_type' => 3,
       'password' => Hash::make(11111111),
     ]);
+    \App\Models\User::factory()->create([
+      'name' => 'Student',
+      'email' => 'student@email.com',
+      'class_id' => 2,
+      'user_type' => 3,
+      'password' => Hash::make(11111111),
+    ]);
+
+    //class and subject
     DB::table('class')->insert([
       'name' => 'RPL',
     ]);

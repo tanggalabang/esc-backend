@@ -19,8 +19,8 @@ class StudentWorkController extends Controller
 {
   public function getWorkByStudent()
   {
-    // $student = Auth::user()->id;
-    $student = 4;
+    $student = Auth::user()->id;
+    // $student = 4;
 
     $studentWorks = StudentWork::where("student_id", $student)
       ->where("is_delete", 0)

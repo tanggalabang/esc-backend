@@ -345,9 +345,9 @@ class MaterialController extends Controller
   public function add(Request $request, $id)
   {
     try {
-      $request->validate([
-        'files' => 'required',
-      ]);
+      // $request->validate([
+      //   'files' => 'required',
+      // ]);
 
       $files = [];
       if ($request->file('files')) {
@@ -360,17 +360,16 @@ class MaterialController extends Controller
 
           ];
         }
+        foreach ($files as $key => $file) {
+          File::create($file);
+        }
+        return $this->sendResponse($files, "Files created succesfully");
       }
 
-      foreach ($files as $key => $file) {
-        File::create($file);
-      }
-
-      return $this->sendResponse($files, "Files created succesfully");
+      return response()->json(['message' => 'No file upload'], 200);
     } catch (\Exception $e) {
-      return response()->json(['message' => 'Error, duplicate email or nis. Please check the data', 'error' => $e->getMessage()], 500);
+      return response()->json(['error' => $e->getMessage()], 500);
     }
-    // return response()->json($id);
   }
   public function get()
   {

@@ -51,6 +51,17 @@ class UserController extends Controller
     // } else {
     //   return "Tidak ada file yang terkirim.";
     // }
+    $input = $request->all();
+
+    $validator = Validator::make($input, [
+      'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Sesuaikan dengan format yang Anda butuhkan
+    ]);
+
+    if ($validator->fails()) {
+      return $this->sendError("Format is not image", $validator->errors());
+    }
+
+    $request->validate([]);
     $user = User::getSingle(Auth::user()->id);
     if (!empty($request->name)) {
       $user->name = trim($request->name);

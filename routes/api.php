@@ -58,7 +58,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::get('files', [AssignmentController::class, 'get']);
   Route::post('files-edit/{uid}', [AssignmentController::class, 'updateAss']);
   //comment ass mat
-  Route::get('comment-assignment', [CommentAssignmentController::class, 'index']);
   Route::post('comment-assignment', [CommentAssignmentController::class, 'create']);
   //times table
 
@@ -86,3 +85,6 @@ Route::put('student-work/{id}', [StudentWorkController::class, 'addUpdate']);
 
 //student
 Route::get('student-with-work', [StudentController::class, 'getStudentWithWork']);
+
+//comment
+Route::get('comment-assignment', [CommentAssignmentController::class, 'index']);
