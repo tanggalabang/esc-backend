@@ -81,6 +81,7 @@ Route::get('assignment-teacher', [AssignmentController::class, 'getAssignmentByT
 //student work
 Route::post('student-work', [StudentWorkController::class, 'store']);
 Route::get('student-work', [StudentWorkController::class, 'getWorkByStudent']);
+Route::get('teacher-student-work', [StudentWorkController::class, 'index']);
 Route::put('student-work/{id}', [StudentWorkController::class, 'addUpdate']);
 
 //student

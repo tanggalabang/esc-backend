@@ -17,6 +17,13 @@ use Str;
 
 class StudentWorkController extends Controller
 {
+  public function index()
+  {
+    $studentWorks = StudentWork::where("is_delete", 0)
+      ->get();
+
+    return response()->json($studentWorks);
+  }
   public function getWorkByStudent()
   {
     $student = Auth::user()->id;
