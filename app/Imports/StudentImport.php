@@ -87,19 +87,19 @@ class StudentImport implements ToCollection, WithHeadingRow, WithValidation
         'password' => Hash::make($password),
         'user_type' => 3,
       ]);
+
+      // Tambahkan data yang diimpor ke daftar
+      $this->importedData[] = [
+        'nis' => $row['nis'],
+        'name' => $row['name'],
+        'email' => $row['email'],
+        'class_id' => $row['class'],
+        'password' => $password,
+      ];
+
+      // Tambahkan email yang diimpor ke daftar
+      $this->importedEmails[] = $row['email'];
     }
-
-    // Tambahkan data yang diimpor ke daftar
-    $this->importedData[] = [
-      'nis' => $row['nis'],
-      'name' => $row['name'],
-      'email' => $row['email'],
-      'class_id' => $row['class'],
-      'password' => $password,
-    ];
-
-    // Tambahkan email yang diimpor ke daftar
-    $this->importedEmails[] = $row['email'];
   }
 
   public function rules(): array

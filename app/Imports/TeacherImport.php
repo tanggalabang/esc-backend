@@ -30,17 +30,17 @@ class TeacherImport implements ToCollection, WithHeadingRow, WithValidation
         'password' => Hash::make($password),
         'user_type' => 2,
       ]);
+
+      // Tambahkan data yang diimpor ke daftar
+      $this->importedData[] = [
+        'name' => $row['name'],
+        'email' => $row['email'],
+        'password' => $password,
+      ];
+
+      // Tambahkan email yang diimpor ke daftar
+      $this->importedEmails[] = $row['email'];
     }
-
-    // Tambahkan data yang diimpor ke daftar
-    $this->importedData[] = [
-      'name' => $row['name'],
-      'email' => $row['email'],
-      'password' => $password,
-    ];
-
-    // Tambahkan email yang diimpor ke daftar
-    $this->importedEmails[] = $row['email'];
   }
 
   public function rules(): array

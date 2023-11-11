@@ -13,7 +13,7 @@ class ClassModel extends Model
   {
     $return = self::select('class.*')
       ->where('class.is_delete', '=', 0);
-    $return = $return->orderBy('class.id', 'asc')
+    $return = $return->orderBy('class.name', 'asc')
       ->get();
     return $return;
   }
