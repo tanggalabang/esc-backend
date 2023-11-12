@@ -49,6 +49,8 @@ class ClassController extends Controller
       }
     }
 
+    $result = collect($result)->sortBy('name')->values()->all();
+
     return response()->json($result, 200);
   }
 

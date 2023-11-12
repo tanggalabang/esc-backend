@@ -109,9 +109,12 @@ class AssignmentController extends Controller
           'updated_at' => $assignment['updated_at'],
         ];
 
+
         $mergedAssignments[] = $mergedAssignment;
       }
     }
+
+    $mergedAssignments = collect($mergedAssignments)->sortByDesc('created_at')->values()->all();
 
     return response()->json($mergedAssignments, 200);
   }
